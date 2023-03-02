@@ -1,4 +1,6 @@
 <script>
+import {homeApi} from "@/network/api/home";
+
 export default {
   data: () => ({
     apiResponse: null
@@ -10,8 +12,7 @@ export default {
 
   methods: {
     async fetchData() {
-      const url = 'http://localhost/'
-      this.apiResponse = await (await fetch(url)).json()
+      this.apiResponse = await homeApi();
     }
   }
 }
