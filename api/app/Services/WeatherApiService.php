@@ -9,14 +9,16 @@ use Psr\Http\Message\ResponseInterface;
 
 class WeatherApiService
 {
-    private const URL = "http://api.weatherapi.com/v1";
+    private const URL = "https://weatherbit-v1-mashape.p.rapidapi.com/current";
+    private const HOST = "weatherbit-v1-mashape.p.rapidapi.com";
     private Client $client;
     private array $params = [];
     private array $headers = [];
 
     public function __construct()
     {
-        $this->params['key'] = $_ENV['WEATHER_API_KEY'];
+        $this->headers['X-RapidAPI-Key'] = $_ENV['WEATHER_API_KEY'];
+        $this->headers['X-RapidAPI-Host'] = self::HOST;
         $this->client = new Client([
             'base_url' => self::URL,
         ]);
@@ -76,8 +78,7 @@ class WeatherApiService
     public function fetchCurrent(): string|ResponseInterface
     {
         try {
-            $url = self::URL . '/current.json';
-            return $this->getRequest(method: 'GET', url: $url, options: [
+            return $this->getRequest(method: 'GET', url: self::URL, options: [
                 'query' => $this->getParams(),
                 'headers' => $this->getHeaders(),
             ]);

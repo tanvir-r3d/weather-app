@@ -13,20 +13,23 @@ class UserWeatherController extends Controller
 {
     public function getUser(Request $request): JsonResponse
     {
-        try {
-            $tempUnit = $request->get('isCelsius', 1) == 1 ? 'metric' : 'imperial';
+        // try {
+            // $tempUnit = $request->get('isCelsius', 1) == 1 ? 'metric' : 'imperial';
 
-            $users = User::all()->map(function ($user) use ($tempUnit) {
+            $users = User::all()->map(function ($user) {
                 $weather = WeatherApiService::init()->setLocation($user->latitude, $user->longitude);
-                $weather->temp = $tempUnit;
-//                $response = json_decode($weather->fetchCurrent()->getBody()->getContents(), true);
-//                $currentWeather = $response['data'][0];
-                dd($weather->fetchCurrent());
-                $user['temperature'] = $currentWeather['temp'];
-                $user['country'] = $currentWeather[''];
-                $user['city_name'] = $currentWeather['city_name'];
-                $user['weather'] = $currentWeather;
-                $user['weather_icon'] = $currentWeather;
+                $weather->start = date('Y-m-d');
+                $weather->end = date('Y-m-d');
+                $response = $weather->fetchCurrent();
+                dump($response);
+                $response = $response->getBody()->getContents();
+                $response = json_decode($response, true)['data'][0];
+                $user['temperature'] = $response['temp'];
+                $user['feels_like'] = $response['app_temp'];
+                $user['city_name'] = $response['city_name'];
+                $user['localtime'] = $response['ob_time'];
+                $user['weather'] = $response['weather']['description'];
+                $user['weather_icon'] = "https://www.weatherbit.io/static/img/icons/".$response['weather']['icon'].".png";
                 return $user;
             });
 
@@ -35,11 +38,11 @@ class UserWeatherController extends Controller
                 'message' => 'Fetched successfully',
                 'code' => Response::HTTP_OK,
             ]);
-        } catch (Exception $exception) {
-            return response()->json([
-                'message' => 'Something went wrong!',
-                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-            ]);
-        }
+        // } catch (Exception $exception) {
+        //     return response()->json([
+        //         'message' => 'Something went wrong!',
+        //         'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+        //     ]);
+        // }
     }
 }
