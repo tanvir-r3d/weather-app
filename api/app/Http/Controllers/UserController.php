@@ -3,23 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Services\WeatherApiService;
 use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserWeatherController extends Controller
+class UserController
 {
-    public function getUser(Request $request)
+    public function index()
     {
         try {
-            $tempUnit = $request->get('isCelsius', 1) == 1 ? 'metric' : 'imperial';
-
-            $users = User::query()->limit(5)->get();
-
-
+            $users = Cache::remember('users', 3600, function () {
+                return User::all();
+            });
             return response()->json([
-                'data' => ['users' => $users, 'weathers' => $weathers],
+                'data' => ['users' => $users],
                 'message' => 'Fetched successfully',
                 'code' => Response::HTTP_OK,
             ]);

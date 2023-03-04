@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\UserWeatherController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::group(['prefix' => 'api/v1'], function () {
-    Route::get('/users', [UserWeatherController::class, 'getUser']);
+    Route::get('/users', [UserController::class, 'index']);
+    Route::get('/weathers', [WeatherController::class, 'index']);
 });
