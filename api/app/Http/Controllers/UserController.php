@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Symfony\Component\HttpFoundation\Response;
 
-class UserController
+class UserController extends Controller
 {
     public function index()
     {
@@ -15,16 +14,9 @@ class UserController
             $users = Cache::remember('users', 3600, function () {
                 return User::all();
             });
-            return response()->json([
-                'data' => ['users' => $users],
-                'message' => 'Fetched successfully',
-                'code' => Response::HTTP_OK,
-            ]);
+            return $this->successResponse(['users' => $users], 'Fetched successfully');
         } catch (Exception $exception) {
-            return response()->json([
-                'message' => $exception->getMessage(),
-                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-            ]);
+            return $this->errorResponse('Something went wrong!');
         }
     }
 }

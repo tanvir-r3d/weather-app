@@ -4,44 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Services\WeatherApiService;
+use App\Services\WeatherFormatter;
 use Exception;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 
-class WeatherController
+class WeatherController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * @param string $email
+     * @return Response
+     */
+    public function index(string $email): Response
     {
         try {
-            $tempUnit = $request->get('isCelsius', 1) == 1 ? 'metric' : 'imperial';
-            $limit = $request->get('limit');
-            $offset = $request->get('offset');
-            $users = User::query()->limit($limit)->offset($offset)->get();
-            $responses = WeatherApiService::init();
-            $responses->units = $tempUnit;
-            $responses = $responses->fetchBulk($users);
-            $weathers = collect($responses)->map(function ($item) {
-                return [
-                    'temp' => $item['main']['temp'],
-                    'temp_max' => $item['main']['temp_max'],
-                    'temp_min' => $item['main']['temp_min'],
-                    'weather' => ucfirst($item['weather'][0]['description']),
-                    'icon' => $item['weather'][0]['icon'],
-                    'feels_like' => $item['main']['feels_like'],
-                    'humidity' => $item['main']['humidity'],
-                ];
-            })->values()->toArray();
+            $weather = Cache::remember($email, 3600, function () use ($email) {
+                $user = User::query()->where('email', $email)->first();
+                $weather = WeatherApiService::init()->setLocation($user->latitude, $user->longitude);
+                $weather->units = 'metric';
+                return $weather->fetchCurrent();
+            });
 
-            return response()->json([
-                'data' => ['weathers' => $weathers],
-                'message' => 'Fetched successfully',
-                'code' => Response::HTTP_OK,
-            ]);
+            $response = WeatherFormatter::format($weather);
+
+            return $this->successResponse(['weather' => $response], 'Fetched successfully');
         } catch (Exception $exception) {
-            return response()->json([
-                'message' => $exception->getMessage(),
-                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-            ]);
+            return $this->errorResponse('Something went wrong!');
         }
+    }
+
+    public function getDetails($email)
+    {
+        $weather = WeatherFormatter::format(Cache::get($email));
+        $details = Cache::remember($email . '_forecast', 3600, function () use ($email) {
+            $user = User::query()->where('email', $email)->first();
+            $weather = WeatherApiService::init()->setLocation($user->latitude, $user->longitude);
+            $weather->units = 'metric';
+            $weather->cnt = 5;
+            return $weather->fetchForecast();
+        });
+        $details = WeatherFormatter::formatDetails($details['list']);
+        return $weather;
     }
 }

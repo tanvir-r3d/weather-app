@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(['prefix' => 'api/v1'], function () {
     Route::get('/users', [UserController::class, 'index']);
-    Route::get('/weathers', [WeatherController::class, 'index']);
+    Route::get('/weathers/{email}', [WeatherController::class, 'index']);
+    Route::get('/weathers/{email}/details', [WeatherController::class, 'getDetails']);
 });

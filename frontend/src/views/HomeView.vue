@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import ApiTest from "@/components/ApiTest.vue";
-</script>
+import Home from "@/components/Home.vue";</script>
 
 <template>
   <main>
-    <api-test></api-test>
+    <Home/>
   </main>
 </template>
