@@ -1,23 +1,23 @@
 <template>
   <div
-      class="modal fade"
-      id="weatherDetails"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="weatherDetailsLabel"
-      aria-hidden="true"
+    class="modal fade"
+    id="weatherDetails"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="weatherDetailsLabel"
+    aria-hidden="true"
   >
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="weatherDetailsLabel">
-            {{ user.name }} Weather Details
+            {{ user.name ?? "" }} Weather Details
           </h5>
           <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -29,43 +29,71 @@
                 <div id="card" class="weater">
                   <div class="city-selected">
                     <article>
-
                       <div class="info">
-                        <div class="night">Night - 22:07 PM</div>
+                        <div class="night">
+                          <b>{{ weather.weather ?? "Cloudy" }}</b>
+                          <img
+                            class="icon"
+                            :src="
+                              'http://openweathermap.org/img/wn/' +
+                              (weather['icon'] ?? '10d') +
+                              '.png'
+                            "
+                            alt="weather_icon"
+                          />
+                        </div>
 
-                        <div class="temp">3°</div>
-
+                        <div class="temp">{{ weather.temp ?? 0 }}&deg; C</div>
                       </div>
-
-                      <div class="icon">
-                      </div>
-
                     </article>
+                    <div class="row">
+                      <div class="col-md-6 text-center" style="color: #fff">
+                        <b
+                          ><p>Min: {{ weather.temp_min ?? 0 }}&deg; C</p></b
+                        >
+                      </div>
+                      <div class="col-md-6 text-center" style="color: #fff">
+                        <b
+                          ><p>
+                            Feels Like: {{ weather.feels_like ?? 0 }}&deg; C
+                          </p></b
+                        >
+                      </div>
+                      <div class="col-md-6 text-center" style="color: #fff">
+                        <b
+                          ><p>Max: {{ weather.temp_max ?? 0 }}&deg; C</p></b
+                        >
+                      </div>
+                      <div class="col-md-6 text-center" style="color: #fff">
+                        <b
+                          ><p>Wind: {{ weather.wind ?? 0 }}</p></b
+                        >
+                      </div>
+                    </div>
                   </div>
 
                   <div class="days">
                     <div class="row row-no-gutter">
-                      <div class="col-md-4">
+                      <div
+                        class="col-md-3"
+                        v-for="(details, key) in weatherDetails"
+                        :key="key"
+                      >
                         <div class="day">
-                          <h1>Monday</h1>
-
+                          <h1>{{ details.date ?? "12/11/2022" }}</h1>
+                          <p>
+                            {{ details.temp ?? 0 }}&deg; C
+                            <img
+                              :src="
+                                'http://openweathermap.org/img/wn/' +
+                                (details['icon'] ?? '10d') +
+                                '.png'
+                              "
+                              alt="weather_icon"
+                            />
+                          </p>
                         </div>
                       </div>
-
-                      <div class="col-md-4">
-                        <div class="day">
-                          <h1>Tuesday</h1>
-
-                        </div>
-                      </div>
-
-                      <div class="col-md-4">
-                        <div class="day">
-                          <h1>Wednesday</h1>
-
-                        </div>
-                      </div>
-
                     </div>
                   </div>
                 </div>
@@ -74,10 +102,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="onModalClose">
             Close
           </button>
-          <button type="button" class="btn btn-primary">Save changes</button>
         </div>
       </div>
     </div>
@@ -85,14 +112,15 @@
 </template>
 
 <script>
-import {weatherDetailsApi} from "@/network/api/home";
+import { weatherDetailsApi } from "@/network/api/home";
 
 export default {
   name: "WeatherDetailsModal.vue",
   props: ["user"],
   data() {
     return {
-      weatherDetails: {},
+      weatherDetails: [],
+      weather: {},
     };
   },
   watch: {
@@ -101,11 +129,15 @@ export default {
     },
   },
   methods: {
+    onModalClose() {
+      this.$emit("onModalClose");
+    },
     async fetchWeatherDetail() {
       try {
-        const {data} = await weatherDetailsApi(this.user["email"]);
+        const { data } = await weatherDetailsApi(this.user["email"]);
         if (data.code === 200) {
           this.weatherDetails = data.data.details;
+          this.weather = data.data.weather;
         }
       } catch (e) {
         console.error(e);
@@ -121,7 +153,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 95px 0;
-  font-family: 'Source Sans Pro', sans-serif;
+  font-family: "Source Sans Pro", sans-serif;
   font-weight: 200;
 }
 
@@ -134,7 +166,6 @@ body {
   padding-right: 0;
   padding-left: 0;
 }
-
 
 #card {
   background: #fff;
@@ -155,7 +186,7 @@ body {
   position: relative;
   overflow: hidden;
   min-height: 200px;
-  background: #3D6AA2;
+  background: #3d6aa2;
 }
 
 article {
@@ -190,7 +221,6 @@ article {
   font-weight: 200;
   position: relative;
 
-
   -webkit-order: 0;
   -ms-flex-order: 0;
   order: 0;
@@ -203,7 +233,7 @@ article {
 }
 
 .info .city:after {
-  content: '';
+  content: "";
   width: 15px;
   height: 2px;
   background: #fff;
@@ -241,9 +271,7 @@ article {
   align-self: center;
 
   overflow: visible;
-
 }
-
 
 .temp {
   font-size: 73px;
@@ -256,7 +284,6 @@ svg {
   color: #fff;
   fill: currentColor;
 }
-
 
 .wind svg {
   width: 18px;
@@ -274,7 +301,6 @@ svg {
 .city-selected:hover figure {
   opacity: 0.4;
 }
-
 
 figure {
   width: 100%;
@@ -315,7 +341,6 @@ figure {
 .day {
   padding: 10px 0px;
   text-align: center;
-
 }
 
 .day h1 {

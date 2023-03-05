@@ -14,8 +14,6 @@ class WeatherApiService
     private array $params = [];
     private array $headers = [];
 
-    private array $bulkResponse = [];
-
     public function __construct()
     {
         $this->params['appid'] = $_ENV['WEATHER_API_KEY'];
@@ -25,11 +23,11 @@ class WeatherApiService
     }
 
     /**
-     * @return static
+     * @return self
      */
     public static function init(): self
     {
-        return new static();
+        return new self();
     }
 
     private function getClient(): Client
@@ -48,11 +46,11 @@ class WeatherApiService
     }
 
     /**
-     * @param string $lat
-     * @param string $lon
+     * @param float $lat
+     * @param float $lon
      * @return WeatherApiService
      */
-    public function setLocation(string $lat, string $lon): self
+    public function setLocation(float $lat, float $lon): self
     {
         $this->params['lat'] = $lat;
         $this->params['lon'] = $lon;
@@ -113,5 +111,10 @@ class WeatherApiService
     {
         $this->params[$name] = $value;
         return $this;
+    }
+
+    public function __get($name)
+    {
+        return $this->params[$name];
     }
 }

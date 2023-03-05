@@ -6,6 +6,10 @@ use Carbon\Carbon;
 
 class WeatherFormatter
 {
+    /**
+     * @param $weather
+     * @return array
+     */
     public static function format($weather): array
     {
         return [
@@ -16,16 +20,25 @@ class WeatherFormatter
             'icon' => $weather['weather'][0]['icon'],
             'feels_like' => $weather['main']['feels_like'],
             'humidity' => $weather['main']['humidity'],
+            'wind' => $weather['wind']['speed'],
         ];
     }
 
-    public static function formatDetails($details)
+    /**
+     * @param $details
+     * @return array
+     */
+    public static function formatDetails($details): array
     {
         $formattedDetail = [];
         foreach ($details as $detail) {
             $formattedDetail[] = [
-                'date'=> Carbon::make($detail['dt_txt'])->format('Y-m-d'),
+                'date' => Carbon::make($detail['dt_txt'])->format('d/m/Y h:m a'),
+                'temp' => $detail['main']['temp'],
+                'weather' => $detail['weather'][0]['description'],
+                'icon' => $detail['weather'][0]['icon'],
             ];
         }
+        return $formattedDetail;
     }
 }

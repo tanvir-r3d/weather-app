@@ -10,11 +10,13 @@
       <span>
         {{ weather["weather"] ?? "Cloudy" }}
         <img
-            :src="
-            'http://openweathermap.org/img/wn/' + (weather['icon'] ?? '10d') + '.png'
+          :src="
+            'http://openweathermap.org/img/wn/' +
+            (weather['icon'] ?? '10d') +
+            '.png'
           "
-            alt="weather_icon"
-        /></span>
+          alt="weather_icon"
+      /></span>
     </div>
     <div class="d-flex">
       <div class="temp-details flex-grow-1">
@@ -26,7 +28,13 @@
         </p>
       </div>
       <div>
-        <p style="cursor: pointer" data-toggle="modal" data-target="#weatherDetails" @click="handleDetailsClick"><u>Details</u>
+        <p
+          style="cursor: pointer"
+          data-toggle="modal"
+          data-target="#weatherDetails"
+          @click="handleDetailsClick"
+        >
+          <u>Details</u>
         </p>
       </div>
     </div>
@@ -34,7 +42,7 @@
 </template>
 
 <script>
-import {weathersApi} from "@/network/api/home";
+import { weathersApi } from "@/network/api/home";
 
 export default {
   name: "WeatherCard",
@@ -50,7 +58,7 @@ export default {
   methods: {
     async fetchWeathers() {
       try {
-        const {data} = await weathersApi(this.user["email"]);
+        const { data } = await weathersApi(this.user["email"]);
         if (data.code === 200) {
           this.weather = data.data.weather;
         }
