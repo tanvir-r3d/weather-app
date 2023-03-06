@@ -61,6 +61,7 @@ class WeatherController extends Controller
                 }
             });
             $details = WeatherFormatter::formatDetails($details['list']);
+
             return $this->successResponse(['weather' => $weather, 'details' => $details], 'Fetched successfully.');
         } catch (Exception $exception) {
             return $this->errorResponse('Something went wrong!');

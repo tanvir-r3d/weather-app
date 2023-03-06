@@ -54,6 +54,7 @@ class WeatherApiService
     {
         $this->params['lat'] = $lat;
         $this->params['lon'] = $lon;
+
         return $this;
     }
 
@@ -82,6 +83,7 @@ class WeatherApiService
                 'headers' => $this->getHeaders(),
             ]);
             $request = $request->getBody()->getContents();
+
             return json_decode($request, true);
         } catch (Exception $exception) {
             return $exception->getMessage();
@@ -101,6 +103,7 @@ class WeatherApiService
                 'headers' => $this->getHeaders(),
             ]);
             $request = $request->getBody()->getContents();
+
             return json_decode($request, true);
         } catch (Exception $exception) {
             return $exception->getMessage();
@@ -110,6 +113,7 @@ class WeatherApiService
     public function __set($name, $value)
     {
         $this->params[$name] = $value;
+
         return $this;
     }
 

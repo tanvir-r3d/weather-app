@@ -4,7 +4,7 @@ namespace App\Traits;
 
 use Symfony\Component\HttpFoundation\Response;
 
-trait  ApiResponse
+trait ApiResponse
 {
     /**
      * Success response send function

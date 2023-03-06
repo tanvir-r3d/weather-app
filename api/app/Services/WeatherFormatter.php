@@ -39,6 +39,7 @@ class WeatherFormatter
                 'icon' => $detail['weather'][0]['icon'],
             ];
         }
+
         return $formattedDetail;
     }
 }
