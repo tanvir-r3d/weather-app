@@ -17,18 +17,19 @@
     </div>
   </section>
 </template>
-<script>
+<script lang="ts">
 import { usersApi } from "@/network/api/home";
 import WeatherCard from "@/components/WeatherCard.vue";
 import { collect } from "collect.js";
 import WeatherDetailsModal from "./WeatherDetailsModal.vue";
-
-export default {
+import { defineComponent } from "vue";
+import type { UserInterface } from "@/interfaces/UserInterface";
+export default defineComponent({
   components: { WeatherDetailsModal, WeatherCard },
   data: () => ({
-    users: [],
-    chunkedUser: [],
-    detailsUser: {},
+    users: new Array<UserInterface>(),
+    chunkedUser: new Array<UserInterface>(),
+    detailsUser: {} as UserInterface,
     limit: 7,
     skip: 0,
   }),
@@ -63,12 +64,12 @@ export default {
         }
       };
     },
-    handleDetailsClick(user) {
+    handleDetailsClick(user: UserInterface) {
       this.detailsUser = user;
     },
     handleModalClose() {
-      this.detailsUser = {};
+      this.detailsUser = {} as UserInterface;
     },
   },
-};
+});
 </script>

@@ -102,7 +102,12 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="onModalClose">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-dismiss="modal"
+            @click="onModalClose"
+          >
             Close
           </button>
         </div>
@@ -111,28 +116,32 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { weatherDetailsApi } from "@/network/api/home";
+import { defineComponent } from "vue";
+import type { WeatherInterface } from "@/interfaces/WeatherInterface";
+import type { WeatherDetailsInterface } from "@/interfaces/WeatherDetailsInterface";
 
-export default {
+export default defineComponent({
   name: "WeatherDetailsModal.vue",
   props: ["user"],
   data() {
     return {
-      weatherDetails: [],
-      weather: {},
+      weatherDetails: new Array<WeatherDetailsInterface>(),
+      weather: {} as WeatherInterface,
     };
   },
   watch: {
-    user() {
+    user(newData: { email: any }) {
+      if (!newData.email) return;
       this.fetchWeatherDetail();
     },
   },
   methods: {
-    onModalClose() {
+    onModalClose(): void {
       this.$emit("onModalClose");
     },
-    async fetchWeatherDetail() {
+    async fetchWeatherDetail(): Promise<void> {
       try {
         const { data } = await weatherDetailsApi(this.user["email"]);
         if (data.code === 200) {
@@ -144,7 +153,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 <style scoped>
 body {

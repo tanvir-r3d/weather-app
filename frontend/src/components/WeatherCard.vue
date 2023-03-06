@@ -41,19 +41,18 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { weathersApi } from "@/network/api/home";
+import { defineComponent } from "vue";
+import type { WeatherInterface } from "@/interfaces/WeatherInterface";
 
-export default {
+export default defineComponent({
   name: "WeatherCard",
   props: ["user"],
   data: () => {
     return {
-      weather: {},
+      weather: {} as WeatherInterface,
     };
-  },
-  mounted() {
-    this.fetchWeathers();
   },
   methods: {
     async fetchWeathers() {
@@ -70,7 +69,10 @@ export default {
       this.$emit("onDetailsClick", this.user);
     },
   },
-};
+  mounted() {
+    this.fetchWeathers();
+  },
+});
 </script>
 
 <style scoped>
